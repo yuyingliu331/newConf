@@ -12,6 +12,21 @@ html, body {
 }
 
 
+.ui-dropdown.ui-widget.ui-state-default.ui-corner-all.ui-helper-clearfix {     
+   width:100% !important;     
+ }
+
+ .ui-multiselect-panel {     
+  max-height: 650px !important;
+  width:100% !important;     
+  min-width: 85% !important;
+  font: 100% "Roboto", sans-serif;     
+  white-space: nowrap;
+ }
+
+.ui-multiselect-filter-container{   
+  width:90% !important;   
+}
 
 .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-shadow.ui-dialog-draggable{
   max-height: 650px !important;
@@ -19,10 +34,25 @@ html, body {
   white-space: nowrap;
 
 }
-.ui-dropdown.ui-widget.ui-state-default.ui-corner-all.ui-helper-clearfix {
-  width: 100% !important;
-}
+.ui-dropdown .ui-dropdown-label{    
+   padding-right: 1.9em;   
+ }
 
+ .ui-dropdown-items .ui-dropdown-list .ui-widget-content .ui-widget .ui-corner-all .ui-helper-reset{    
+   font-family: 'Roboto' !important;   
+ }   
+ .contentDetails {   
+   font-family: 'Roboto' !important;   
+ }
+
+
+.ui-dropdown-filter-container{    
+   width: 100% !important;   
+ }   
+     
+ .ui-multiselect  {    
+   width:100% !important;    
+ }
 
 /*#boolean {
     display:inline;
@@ -567,7 +597,7 @@ input:-moz-placeholder {
 }
 
 .template-dropdown {
-  /*width: 40%;*/
+  width: 40%;
   right: 16px;
   top: 4px;
   position: absolute;

@@ -14,15 +14,15 @@ import {SelectItem} from 'primeng/primeng';
 export class HomeComponent implements OnInit {
 
   systemOfOrigins = new Array();
-  channels: SelectItem[];
+  channels = new Array();
   contentTypes = new Array();
   priorities = new Array();
   renditions: SelectItem[];
-  workflows = new Array();
-  archivalRules = new Array();
-  formats = new Array();
-  defaultSoO = '';
-  defaultPriority = '';
+   workflows: SelectItem[];    
+  archivalRules: SelectItem[];    
+  formats: SelectItem[];     
+  defaultSoO: SelectItem[];    
+  defaultPriority: any;
   selectedContentType: any;
   isRush = false;
   selectedPriority: any;
@@ -31,10 +31,10 @@ export class HomeComponent implements OnInit {
   name = new Array();
   value = new Array();
   attributes = new Array<Attribute>();
-  codeSet: any = [];
-  codeValues: any = [];
-  codeSetDelta: any = [];
-  templates = new Array();
+  codeSet = new Array();   
+    codeValues: any = [];       
+   codeSetDelta= new Array();   
+   templates: SelectItem[];
   selectedTemplate: any;
   id: number;
   seletedChannels = [];
@@ -44,13 +44,13 @@ export class HomeComponent implements OnInit {
   archRuleSelect: any;
   attributeResult = new Array();
   display: boolean = false;
-
+ 
 
   constructor(private adalService: AdalService,
               private dataService: GetDataService,
               private modalService: ModalService,
               private elementRef:ElementRef) {
-    this.workflows = [{'name': ''}];
+    
   }
 
   public logOut() {
@@ -62,12 +62,20 @@ export class HomeComponent implements OnInit {
     this.dataService.getSystemOrigin()
       .subscribe((data: any) => {
         this.systemOfOrigins = data['value'];
+         this.systemOfOrigins.map (sys=>{    
+           sys.label = sys['SystemOfOriginDesc'];    
+           sys.value = sys['SystemOfOriginId']    
+        });
         this.defaultSoO = this.systemOfOrigins[9];
       });
 
     this.dataService.getPriority()
       .subscribe((data: any) => {
         this.priorities = data['value'];
+        this.priorities.map (prior=>{    
+          prior.value = prior['Priority_Id'];    
+          prior.label = prior['Desc'];    
+       });
       });
 
     this.dataService.getChannel()
@@ -82,6 +90,10 @@ export class HomeComponent implements OnInit {
     this.dataService.getContentType()
       .subscribe((data: any) => {
         this.contentTypes = data['value'];
+           this.contentTypes.map (con =>{    
+          con.label = con['ContentTypeDesc'];    
+         con.value = con['ContentTypeId'];    
+        })
         this.selectedContentType = this.contentTypes[1];
       });
 
@@ -101,24 +113,33 @@ export class HomeComponent implements OnInit {
     this.dataService.getFormat()
       .subscribe((data: any) => {
         this.formats = data;
+         this.formats.map (form =>{    
+           form.label = form['Description'];    
+           form.value = form['FormatId'];    
+        });
       });
 
     this.dataService.getArchivalRule()
       .subscribe((data: any) => {
         this.archivalRules = data['value'];
+          this.archivalRules.map(rules=> {    
+            rules.label = rules ['RuleName'];    
+            rules.value = rules ['ArchivalRuleId'];    
+          });
       });
   }
 
   updateWorkFlowChange(format: any): any {
-    let formatId = format['FormatId'];
+    let formatId = format;
     this.dataService.getWorkFlow(formatId)
       .subscribe((data: any) => {
         this.workflows = data;
+         this.workflows.map(workflow => {    
+          workflow.label = workflow['Name'];    
+          workflow.value = workflow['WorkflowTemplateId'];    
+        });
       });
   }
-
-
-
 
   dirResult($event) {
       this.selectedDirList = $event;
@@ -156,6 +177,11 @@ export class HomeComponent implements OnInit {
     this.dataService.getTemplates()
       .subscribe((data: any) => {
         this.templates = data['value'];
+        this.templates.map (temp => {    
+         temp.label = temp['AttributeTemplateDesc'];    
+         temp.value = temp['AttributeTemplateId'];    
+         temp['templates'] = temp['AttributeTemplateValue'] ;    
+       });
 
       });
 
@@ -169,9 +195,9 @@ export class HomeComponent implements OnInit {
   getTemplate(templateId) {
     let tmpArr = new Array<Attribute>();
     this.templates.forEach(function (x) {
-      if (x.AttributeTemplateId === templateId) {
-        x['AttributeTemplateValue'].forEach(function (this, z) {
-          if (x.AttributeTemplateId === templateId) {
+       if (x.value === templateId) {     
+         x['templates'].forEach(function (this, z) {    
+           if (x.value === templateId) {
             tmpArr.push(new Attribute(z.CodeSet, z.CodeValue));
           }
         });
@@ -199,6 +225,11 @@ export class HomeComponent implements OnInit {
       if (!match)
         this.codeSetDelta.push(x);
     })
+      this.codeSetDelta.map(csd =>{    
+      csd.label = csd['CodeSet1'];    
+      csd.value = csd ['CodeSet1'];    
+      csd.dataType = csd['Datatype'];    
+   })
     this.codeSetDelta.sort((a, b) => {
       return (a.CodeSet1 < b.CodeSet1) ? -1 : 1;
     });
@@ -210,7 +241,7 @@ export class HomeComponent implements OnInit {
     let list = this.codeValues.filter(t => t.CodeSet === attribute.name);// returns array
     attribute.codeValues = [];
     list.forEach(function (x) {
-      attribute.codeValues.push(x.CodeValueValue);
+      attribute.codeValues.push({value: x.CodeValueValue, label: x.CodeValueValue});
     });
     this.getDelta();
     let location = this.attributes.indexOf(attribute);
@@ -237,6 +268,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
+ 
+
 
 
   submit() {
@@ -247,7 +280,7 @@ export class HomeComponent implements OnInit {
     let userEmail = currentInfo.Email;
     let resultChannels = [];
     this.seletedChannels.map(data => {
-      resultChannels.push((data.value).toString());
+      resultChannels.push((data).toString());
     });
     console.log(this.selectedDirList, 'selected files');
 
@@ -266,42 +299,40 @@ export class HomeComponent implements OnInit {
       obj['value'] =  attribute.value;
       this.attributeResult.push(obj);
     });
+    let sOOSelected = "";
+    if(this.defaultSoO.value) sOOSelected = this.defaultSoO.value;
+    else sOOSelected = this.defaultSoO;
 
     // console.log('total selected files', totalSelectedFiles, (this.selectedPriority.Priority_Id).toString());
+   
+
+
     let ingestItem = {
       'SubmittedBy': userName.toString(),
       'UserId': userId.toString(),
       'UserEmail': userEmail.toString(),
-      'SystemOfOrigin': 'X',
-      'ContentTypeId': (this.selectedContentType.ContentTypeId).toString(),
+      'SystemOfOrigin': (sOOSelected).toString(),  
+      'ContentTypeId': (this.selectedContentType).toString(),
       'Channels': resultChannels,
-      'PriorityId': (this.selectedPriority.Priority_Id).toString(),
+      'PriorityId': (this.selectedPriority).toString(),
       'RushReason': this.intputReason,
-      'RenditionId': (this.renditionSelected.RenditionId).toString(),
-      'FormatId': (this.formatSelected.FormatId).toString(),
-      'WorkFlowId': (this.wfSelected.WorkflowTemplateId).toString(),
-      'ArchivalRuleId': (this.archRuleSelect.ArchivalRuleId).toString(),
+      'RenditionId': (this.renditionSelected).toString(),
+      'FormatId': (this.formatSelected).toString(),
+      'WorkFlowId': (this.wfSelected).toString(),
+      'ArchivalRuleId': (this.archRuleSelect).toString(),
       'Attributes': this.attributeResult,
       'Files': totalSelectedFiles
     }
-    console.log('ingest item', JSON.stringify(ingestItem));
+    console.log(sOOSelected,'system of origin');
+    //console.log('ingest item', JSON.stringify(ingestItem));
     //this.dataService.submitBulkIngest(JSON.stringify(ingestItem));
 
   }
-// ngAfterViewInit() {
-//      this.loadData();
-//     this.getCodeSets();
-//     this.loadTemplates();
-//   var s = document.createElement("script");
-//   s.type = "text/javascript";
-//   s.src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js";
-//   this.elementRef.nativeElement.appendChild(s);
-// }
-
   ngOnInit() {
     this.loadData();
     this.getCodeSets();
     this.loadTemplates();
+   
 
   }
 }

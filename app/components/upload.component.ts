@@ -19,13 +19,12 @@ export class UploadComponent implements OnInit {
   @Input() updatedResult;
   @Output() selectedDir = new EventEmitter();
 
-
     currLib: Library;
     allCheck: boolean;
+    dirLevelFolder = [];
     libraries = new Array<Library>();
     allIsChecked: boolean = false;
     isSubChecked: boolean = false;
-
 
     constructor (private dataService: GetDataService, private modalService: ModalService) {}
     loadLibrary() {
@@ -33,7 +32,7 @@ export class UploadComponent implements OnInit {
           .subscribe((data: any) => {
             data.map(library => this.libraries.push(new Library(library['Id'], library['Description'], library['PhysicalPath'])));
           });
-  }
+    }
 
     closeModal(id: string) {
       this.currLib = null;
@@ -41,13 +40,16 @@ export class UploadComponent implements OnInit {
     }
 
     getSubFolder(library) {
-      this.currLib = library;
-      this.currLib.directories = [];
+        this.currLib = library;
+        this.currLib.directories = [];
 
-      this.dataService.getChildLibrary(library.id, '')
+        this.dataService.getChildLibrary(library.id, '')
           .subscribe((data: any) => {
-                 data.map(dir =>  this.currLib.directories.push(new Directory(library.id, dir['name'], dir['relativePath'], dir['fullPath'], dir['isDirectory'], 1, null)));
-      });
+            data.map(dir =>  this.currLib.directories.push(new Directory(library.id, dir['name'], dir['relativePath'], dir['fullPath'], dir['isDirectory'], 1, null)));
+          });
+        this.dirLevelFolder = [];
+        this.dirLevelFolder = [this.currLib.directories];
+        console.log('get librar', this.currLib.directories, this.dirLevelFolder);
     }
 
   selectAll(directories) {
@@ -76,9 +78,18 @@ export class UploadComponent implements OnInit {
       currDirList.map(curDir => {
         this.allCheck = (!curDir.isDirectory && !curDir.isSelected) ? false : this.allCheck;
       });
+
   }
 
-  isLatestLevel(childrenList){
+  selectedFolder($event){
+
+    let lastLevel = this.dirLevelFolder.length;
+    this.dirLevelFolder = this.dirLevelFolder.slice(0, $event.level);
+    this.dirLevelFolder.push($event.children);
+    console.log(this.dirLevelFolder);
+  }
+
+  isLatestLevel(childrenList) {
     let isLatest = true;
     childrenList.map(child => {
       isLatest = child.children.length > 0 ? false : isLatest;
@@ -98,6 +109,8 @@ export class UploadComponent implements OnInit {
       this.selectedDir.emit( this.updatedResult);
       console.log('final result',  this.updatedResult);
     }
+    this.closeModal('custom-modal-1');
+    this.modalService.close('custom-modal-1');
 
   }
 
@@ -107,7 +120,7 @@ export class UploadComponent implements OnInit {
       if(singleDir.children.length > 0){
         return this.getSelected(singleDir.children, resultArr);
       }else{
-        if(singleDir.isSelected){
+        if(singleDir.isSelected) {
           resultArr.push(singleDir);
         }
       }
@@ -115,7 +128,7 @@ export class UploadComponent implements OnInit {
     return resultArr;
   }
 
-  clearSelection(){
+  clearSelection() {
     this.updatedResult = [];
     this.selectedDir.emit(this.updatedResult);
     this.currLib = null;

@@ -18,8 +18,10 @@ import { SubFolderComponent } from './components/subFolders.component';
 import { LoggedInGuard } from './authentication/logged-in.guard';
 import { SecretService } from './services/secret.service';
 import { GetDataService } from './services/data.service';
+
 import {MultiSelectModule} from 'primeng/primeng';
 import {DropdownModule} from 'primeng/primeng';
+import {DialogModule} from 'primeng/primeng';
 
 
 import { ModalComponent } from './directives/index';
@@ -29,7 +31,7 @@ import {TooltipModule} from 'ngx-tooltip';
 
 
 @NgModule({
-  imports:      [ BrowserModule, routes, FormsModule, HttpModule, Angular2FontawesomeModule, TooltipModule, MultiSelectModule, DropdownModule  ],
+  imports:      [ BrowserModule, routes, FormsModule, HttpModule, Angular2FontawesomeModule, TooltipModule, MultiSelectModule, DropdownModule, DialogModule],
   declarations: [ AppComponent, HomeComponent, WelcomeComponent, ModalComponent, UploadComponent, SubFolderComponent],
   providers: [AdalService, SecretService, LoggedInGuard, GetDataService, ModalService],
   bootstrap:    [ AppComponent ],

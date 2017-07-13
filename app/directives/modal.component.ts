@@ -29,7 +29,7 @@ export class ModalComponent implements OnInit, OnDestroy {
         }
 
         // move element to bottom of page (just before </body>) so it can be displayed above everything else
-        this.element.appendTo('body');
+        // this.element.appendTo('body');
 
         // close modal on background click
         this.element.on('click', function (e: any) {
@@ -51,7 +51,7 @@ export class ModalComponent implements OnInit, OnDestroy {
 
     // open modal
     open(): void {
-        this.element.show();
+        // this.element.show();
         $('body').addClass('modal-open');
         $('.modal').css({'display':'block'});
 
@@ -61,7 +61,7 @@ export class ModalComponent implements OnInit, OnDestroy {
     close(): void {
         let emeptyLib: Library;
         this.clearedOutput.emit(emeptyLib);
-        this.element.hide();
+        // this.element.hide();
         $('body').removeClass('modal-open');
 
     }

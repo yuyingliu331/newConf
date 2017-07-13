@@ -1,46 +1,46 @@
-<modal id="custom-modal-1" (clearedOutput)="updateCurrLib($event)">
-  <div class="modal">
-    <div class="modal-body" style="min-height:580px">
-      <h1 style="height:auto">
-        <strong>Library</strong> Explorer
-      </h1>
-      <form #uploadForm="ngForm">
-        <div>
-          <div class="col-md-3 formAdj div-file-folder-list left-side-library"  style="float:left" >
-            <div style="display:block" name="showSubFolder"
-                       *ngFor="let library of libraries" [ngModel]="library" (click)="getSubFolder(library)"
-                       ngDefaultControl>{{library.name}}
+
+
+
+<!--<modal id="custom-modal-1" (clearedOutput)="updateCurrLib($event)">-->
+  <!--<div class="modal">-->
+    <!--<div class="modal-body" style="max-height:400px">-->
+      <!--<h1 style="height:auto">-->
+
+<modal id="custom-modal-1">
+
+
+          <div class="row dheight" style="overflow-x:auto; display: inline-block">
+            <div class="col-log-3 div-file-fixed-list" style="overflow-x:auto; display: inline-block">
+              <div  name="showSubFolder"  *ngFor="let library of libraries" [ngModel]="library" (click)="getSubFolder(library)" ngDefaultControl>
+                         <div class="clearfix folder-list active">
+                            <i class="fa fa-hdd-o"></i>
+                           <span class="folder-list-items"> {{library.name}}</span>
+                            <i class="fa fa-angle-right pull-right" aria-hidden="true"></i>
+                          </div>
+
+              </div>
             </div>
-          </div>
-        </div>
-       <div *ngIf="currLib" style="float: left; display: block; position: relative; width: 45%">
-              <input type="checkbox" name="selectParent" (click)="selectAll(currLib.directories)" [ngModel]="isAllSelected(currLib.directories)" [ngModelOptions]="{standalone: true}">
-                 <strong>Select All</strong>
-             <div class="right-side-folder" *ngFor="let directory of currLib.directories" >
 
-                <sub-folder [directory]="directory" [library] = "currLib" (selectLib)="updateSelectAll()"></sub-folder>
-            </div>
+            <div *ngIf="currLib" style="overflow-x:auto; display: inline-block">
+              <div *ngFor="let item of dirLevelFolder" class="div-file-fixed-list">
+                <input type="checkbox" name="selectParent" (click)="selectAll(item)" [ngModel]="isAllSelected(item)" [ngModelOptions]="{standalone: true}">
+                Select All
+                <div *ngFor="let dir of item">
+                  <sub-folder (selectDir)="selectedFolder($event)" [directory]="dir" [library] = "currLib" (selectLib)="updateSelectAll()"></sub-folder>
+                  </div>
 
-
-
-       </div>
-        <div style="position: absolute;right:0;bottom:0; margin: 10px">
-            <div *ngIf="currLib">
-              <button type="button" class="btn btn-success" (click)="submit()">Submit Selection</button>
-            </div>
-               <div>
-                    <button type="button" class="btn btn-primary" (click)="clearSelection()">Clear Selection</button>
-               </div>
-            <button type="button" class="btn btn-primary" (click)="closeModal('custom-modal-1')">Close</button>
-        </div>
-      </form>
+              </div>
+              </div>
+           </div>
 
 
-  </div>
-  </div>
-  <div class="modal-background"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn secondary-btn" (click)="clearSelection()" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn primary-btn" (click)="submit()">Submit Files</button>
+    </div>
 
 </modal>
+
 
 
 

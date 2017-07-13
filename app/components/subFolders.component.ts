@@ -5,29 +5,30 @@ import { GetDataService } from '../services/data.service';
 
 @Component({
   selector: 'sub-folder',
-  template: `    
-    <div class="right-folder-list">
-      <div *ngIf="directory.isDirectory === false && directory.checkEnable" style="display: inline-block">
-          <input name="singleSelect" type="checkbox" (click)="selectSingle(directory)" [(ngModel)]="directory.isSelected" [ngModelOptions]="{standalone: true}">
-      </div>
-          <i fa [name]="getIcon(directory)" style="color: blue"></i>
-          <span (click)="loadFolders(directory)">{{directory.name}}</span>
-  </div>
-      <div *ngIf="directory.children.length > 0"  style="position: relative; left: 150px;">
-          <input type="checkbox" name="selectChild" (click)="selectAll(directory.children)" [ngModel]="isAllSelected(directory.children)" [ngModelOptions]="{standalone: true}"> 
-        <strong>Select All</strong>
-        <div class="children" *ngFor="let childDir of directory.children">
-          <sub-folder [directory]="childDir" (selectLib)="updateChildAll(childDir)"></sub-folder>
+  template: `
+ 
+      <div class="clearfix folder-list" >
+          <div *ngIf="directory.isDirectory === false && directory.checkEnable" class="checkbox checkbox-info">
+            <input name="singleSelected" type="checkbox" (click)="selectSingle(directory)" [(ngModel)]="directory.isSelected" [ngModelOptions]="{standalone: true}">
+            <label> </label>
+          </div>
+            <i *ngIf="directory.isDirectory == false" class="fa fa-file-video-o" aria-hidden="true"></i>
+            <i *ngIf="directory.isDirectory == true" class="fa fa-folder-o"></i>
+              <span class="folder-list-items" (click)="loadFolders(directory)">
+                {{directory.name}}
+              </span>
+          <i class="fa fa-angle-right pull-right" aria-hidden="true"></i>
         </div>
-      </div>
   `
 
 })
 export class SubFolderComponent {
 
- @Input() directory;
+
  @Input() library;
+ @Input() directory;
  @Output() selectLib = new EventEmitter();
+ @Output() selectDir = new EventEmitter();
  subAllSelected: boolean;
 
 
@@ -43,15 +44,17 @@ export class SubFolderComponent {
 
     this.dataService.getChildLibrary(dir.parentId, dir.path)
       .subscribe((data: any) => {
-        data.map(d => dir.children.push(new Directory(dir.parentId, d['name'], d['relativePath'], d['fullPath'], d['isDirectory'], dir.level+1, dir)));
+        data.map(d => dir.children.push(new Directory(dir.parentId, d['name'], d['relativePath'], d['fullPath'], d['isDirectory'], dir.level + 1, dir)));
+
       });
+    this.selectDir.emit(dir);
   }
 
   selectAll(directories) {
     this.subAllSelected = this.isAllSelected(directories);
     this.subAllSelected = !this.subAllSelected;
     directories.map(dir => {
-      dir.isSelected = (this.subAllSelected && !dir.isDirectory) ? true: false;
+      dir.isSelected = (this.subAllSelected && !dir.isDirectory) ? true : false;
     });
   }
 

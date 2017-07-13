@@ -3,6 +3,7 @@ import {AdalService} from 'ng2-adal/core';
 import {GetDataService} from '../services/data.service';
 import {Attribute} from './class/attribute.class';
 import { ModalService } from '../services/index';
+
 import {SelectItem} from 'primeng/primeng';
 
 
@@ -13,15 +14,15 @@ import {SelectItem} from 'primeng/primeng';
 export class HomeComponent implements OnInit {
 
   systemOfOrigins = new Array();
-  channels = new Array();
+  channels: SelectItem[];
   contentTypes = new Array();
   priorities = new Array();
   renditions: SelectItem[];
-  workflows: SelectItem[];
-  archivalRules: SelectItem[];
-  formats: SelectItem[];
-  defaultSoO: SelectItem[];
-  defaultPriority: any;
+  workflows = new Array();
+  archivalRules = new Array();
+  formats = new Array();
+  defaultSoO = '';
+  defaultPriority = '';
   selectedContentType: any;
   isRush = false;
   selectedPriority: any;
@@ -30,10 +31,10 @@ export class HomeComponent implements OnInit {
   name = new Array();
   value = new Array();
   attributes = new Array<Attribute>();
-  codeSet = new Array();
+  codeSet: any = [];
   codeValues: any = [];
-  codeSetDelta= new Array();
-  templates: SelectItem[];
+  codeSetDelta: any = [];
+  templates = new Array();
   selectedTemplate: any;
   id: number;
   seletedChannels = [];
@@ -42,54 +43,45 @@ export class HomeComponent implements OnInit {
   wfSelected: any;
   archRuleSelect: any;
   attributeResult = new Array();
+  display: boolean = false;
 
 
   constructor(private adalService: AdalService,
               private dataService: GetDataService,
               private modalService: ModalService,
               private elementRef:ElementRef) {
-   // this.workflows = [{'name': ''}];
+    this.workflows = [{'name': ''}];
   }
+
   public logOut() {
     this.adalService.logOut();
   }
 
   loadData() {
+
     this.dataService.getSystemOrigin()
       .subscribe((data: any) => {
         this.systemOfOrigins = data['value'];
-        this.systemOfOrigins.map (sys=>{
-          sys.label = sys['SystemOfOriginDesc'];
-          sys.value = sys['SystemOfOriginId']
-        });
         this.defaultSoO = this.systemOfOrigins[9];
       });
 
     this.dataService.getPriority()
       .subscribe((data: any) => {
         this.priorities = data['value'];
-        this.priorities.map (prior=>{
-          prior.value = prior['Priority_Id'];
-           prior.label = prior['Desc'];
-        });
       });
 
     this.dataService.getChannel()
       .subscribe((data: any) => {
         this.channels = data['value'];
-         this.channels.map(cha => {
-        cha.value = cha['ChannelId'];
-        cha.label = cha['ChannelName'];
-      });
+        this.channels.map(cha => {
+          cha.label = cha['ChannelName'];
+          cha.value = cha['ChannelId'];
+        })
       });
 
     this.dataService.getContentType()
       .subscribe((data: any) => {
         this.contentTypes = data['value'];
-        this.contentTypes.map (con =>{
-          con.label = con['ContentTypeDesc'];
-          con.value = con['ContentTypeId'];
-        })
         this.selectedContentType = this.contentTypes[1];
       });
 
@@ -99,61 +91,62 @@ export class HomeComponent implements OnInit {
         this.renditions = this.renditions.filter(ren => {
           return ren['IsDigital'] === true;
         });
-        this.renditions.map (rend => {
-          rend.label = rend['RenditionDesc'];
-          rend.value = rend['RenditionId'];
-        });
+        this.renditions.map(ren=>{
+          ren.label = ren['RenditionDesc'];
+          ren.value = ren['RenditionId'];
+        })
+
       });
 
     this.dataService.getFormat()
       .subscribe((data: any) => {
         this.formats = data;
-        this.formats.map (form =>{
-          form.label = form['Description'];
-          form.value = form['FormatId'];
-        });
       });
 
     this.dataService.getArchivalRule()
       .subscribe((data: any) => {
         this.archivalRules = data['value'];
-         this.archivalRules.map(rules=> {
-           rules.label = rules ['RuleName'];
-           rules.value = rules ['ArchivalRuleId'];
-         });
       });
   }
-  updateWorkFlowChange(format: any): any {
-    let formatId = format;
-    this.dataService.getWorkFlow(formatId)
 
+  updateWorkFlowChange(format: any): any {
+    let formatId = format['FormatId'];
+    this.dataService.getWorkFlow(formatId)
       .subscribe((data: any) => {
         this.workflows = data;
-        this.workflows.map(workflow => {
-          workflow.label = workflow['Name'];
-          workflow.value = workflow['WorkflowTemplateId'];
-        });
-
       });
   }
+
+
+
+
   dirResult($event) {
       this.selectedDirList = $event;
       return $event;
   }
+
   clearSelection() {
       this.selectedDirList = [];
   }
+
   deletedChannel(channel) {
       for (let i = 0; i < this.seletedChannels.length; i++) {
           if (channel.ChannelId === this.seletedChannels[i].ChannelId) {
               this.seletedChannels.splice(i, 1);
               break;
-          }
+      }
       }
   }
   openModal(id: string) {
       this.modalService.open(id);
+
   }
+
+
+  showDialog(){
+    this.display = true;
+  }
+
 
   getIconName() {
       return 'upload';
@@ -163,31 +156,27 @@ export class HomeComponent implements OnInit {
     this.dataService.getTemplates()
       .subscribe((data: any) => {
         this.templates = data['value'];
-        this.templates.map (temp => {
-          temp.label = temp['AttributeTemplateDesc'];
-          temp.value = temp['AttributeTemplateId'];
-          temp['templates'] = temp['AttributeTemplateValue'] ;
-        });
 
       });
+
     this.dataService.getCodeValues()
       .subscribe((data: any) => {
         this.codeValues = data['value'];
       });
+
   }
 
   getTemplate(templateId) {
     let tmpArr = new Array<Attribute>();
     this.templates.forEach(function (x) {
-      if (x.value === templateId) {
-        x['templates'].forEach(function (this, z) {
-          if (x.value === templateId) {
+      if (x.AttributeTemplateId === templateId) {
+        x['AttributeTemplateValue'].forEach(function (this, z) {
+          if (x.AttributeTemplateId === templateId) {
             tmpArr.push(new Attribute(z.CodeSet, z.CodeValue));
-           }
-
+          }
         });
       }
-    });
+    })
     this.attributes = tmpArr;
     this.getDelta();
   }
@@ -196,12 +185,11 @@ export class HomeComponent implements OnInit {
     this.dataService.getCodeSets()
       .subscribe((data: any) => {
         this.codeSet = data['value'];
-      });  
+      });
   }
 
   getDelta() {
     this.codeSetDelta = [];
-  
     this.codeSet.forEach(x => {
       let match = false;
       this.attributes.forEach(y => {
@@ -211,18 +199,10 @@ export class HomeComponent implements OnInit {
       if (!match)
         this.codeSetDelta.push(x);
     })
-    
-    this.codeSetDelta.map(csd =>{
-      csd.label = csd['CodeSet1'];
-      csd.value = csd ['CodeSet1'];
-      csd.dataType = csd['Datatype'];
-    })
     this.codeSetDelta.sort((a, b) => {
       return (a.CodeSet1 < b.CodeSet1) ? -1 : 1;
     });
-  
   }
-
 
   editAttribute(attribute, index) {
     attribute.isEditable = true;
@@ -230,7 +210,7 @@ export class HomeComponent implements OnInit {
     let list = this.codeValues.filter(t => t.CodeSet === attribute.name);// returns array
     attribute.codeValues = [];
     list.forEach(function (x) {
-      attribute.codeValues.push({value: x.CodeValueValue, label: x.CodeValueValue});
+      attribute.codeValues.push(x.CodeValueValue);
     });
     this.getDelta();
     let location = this.attributes.indexOf(attribute);
@@ -257,6 +237,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
+
+
   submit() {
     this.attributeResult = [];
     let currentInfo = JSON.parse(sessionStorage.getItem('currentUser'));
@@ -265,8 +247,9 @@ export class HomeComponent implements OnInit {
     let userEmail = currentInfo.Email;
     let resultChannels = [];
     this.seletedChannels.map(data => {
-      resultChannels.push((data).toString());
+      resultChannels.push((data.value).toString());
     });
+    console.log(this.selectedDirList, 'selected files');
 
     let totalSelectedFiles = [];
 
@@ -283,29 +266,43 @@ export class HomeComponent implements OnInit {
       obj['value'] =  attribute.value;
       this.attributeResult.push(obj);
     });
+
+    // console.log('total selected files', totalSelectedFiles, (this.selectedPriority.Priority_Id).toString());
     let ingestItem = {
       'SubmittedBy': userName.toString(),
       'UserId': userId.toString(),
       'UserEmail': userEmail.toString(),
       'SystemOfOrigin': 'X',
-      'ContentTypeId': (this.selectedContentType).toString(),
+      'ContentTypeId': (this.selectedContentType.ContentTypeId).toString(),
       'Channels': resultChannels,
-      'PriorityId': (this.selectedPriority).toString(),
+      'PriorityId': (this.selectedPriority.Priority_Id).toString(),
       'RushReason': this.intputReason,
-      'RenditionId': (this.renditionSelected).toString(),
-      'FormatId': (this.formatSelected).toString(),
-      'WorkFlowId': (this.wfSelected).toString(),
-      'ArchivalRuleId': (this.archRuleSelect).toString(),
+      'RenditionId': (this.renditionSelected.RenditionId).toString(),
+      'FormatId': (this.formatSelected.FormatId).toString(),
+      'WorkFlowId': (this.wfSelected.WorkflowTemplateId).toString(),
+      'ArchivalRuleId': (this.archRuleSelect.ArchivalRuleId).toString(),
       'Attributes': this.attributeResult,
       'Files': totalSelectedFiles
     }
     console.log('ingest item', JSON.stringify(ingestItem));
+    //this.dataService.submitBulkIngest(JSON.stringify(ingestItem));
 
   }
+// ngAfterViewInit() {
+//      this.loadData();
+//     this.getCodeSets();
+//     this.loadTemplates();
+//   var s = document.createElement("script");
+//   s.type = "text/javascript";
+//   s.src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js";
+//   this.elementRef.nativeElement.appendChild(s);
+// }
+
   ngOnInit() {
     this.loadData();
     this.getCodeSets();
     this.loadTemplates();
+
   }
 }
 

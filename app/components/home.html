@@ -1,0 +1,173 @@
+<nav class="navbar navbar-default custom-navbar">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://localhost:58911"></a>
+        </div>
+        <div class="layout-header">
+            Bulk Ingest
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+</nav>
+
+
+<div class="container-fluid" id="BulkIngestContent">
+    <div class="content-inner">
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default" id="Content-Panel">
+                <div class="panel-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" href="#ContentDetails">
+                        <h4 class="panel-title">
+
+                            Content Details <span class="required-astrick">*</span>
+
+                        </h4>
+                    </a>
+                </div>
+                <div id="ContentDetails" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+
+                        <div class="content-form">
+                            <div class="col-lg-6">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="inputEmail3" class="col-sm-2 control-label">System of Origin</label>
+                                        <div class="col-sm-10">
+                                             <p-dropdown class="contentDetails" [options]="systemOfOrigins" [(ngModel)]="defaultSoO" [ngModelOptions]="{standalone: true}"  filter="filter" placeholder="NONE"></p-dropdown>
+                                           
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="inputEmail3" class="col-sm-2 control-label">Content Type</label>
+                                        <div class="col-sm-10">
+                                              <p-dropdown  class="contentDetails" [options]="contentTypes" [(ngModel)]="selectedContentType" [ngModelOptions]="{standalone: true}"  filter="filter" placeholder="Choose"></p-dropdown>
+                                           
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inputPassword3" class="col-sm-2 control-label">Rendition</label>
+                                        <div class="col-sm-10">
+                                            <p-dropdown id ="rendition" class="contentDetails" [options]="renditions" [(ngModel)]="renditionSelected" [ngModelOptions]="{standalone: true}"  filter="filter"></p-dropdown>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="inputPassword3" class="col-sm-2 control-label">Format</label>
+                                        <div class="col-sm-10">
+                                            <p-dropdown class="contentDetails"  [options]="formats" [(ngModel)]="formatSelected" (onChange)="updateWorkFlowChange(formatSelected)" [ngModelOptions]="{standalone: true}" filter="filter" placeholder="Select a format"></p-dropdown>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="inputPassword3" class="col-sm-2 control-label">Archival Rule</label>
+                                        <div class="col-sm-10">
+                                             <p-dropdown class="contentDetails"  id="arch" [options]="archivalRules" [(ngModel)]="archRuleSelect" [ngModelOptions]="{standalone: true}" placeholder="Select an Archival Rule"></p-dropdown>
+                                            
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                <div class="col-lg-6">
+                  <form class="form-horizontal">
+                    <div class="form-group">
+                      <label for="inputEmail3" class="col-sm-2 control-label">Channel</label>
+                      <div class="col-sm-10">
+                           <p-multiSelect class="contentDetails"  name="channels" [options]="channels" [(ngModel)]="seletedChannels" [ngModelOptions]="{standalone: true}"  filter="filter"></p-multiSelect>
+                       
+                      </div>
+                    </div>
+
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-2 control-label">Workflow</label>
+                                <div class="col-sm-10">
+                                   <p-dropdown class="contentDetails" id="arch" [options]="workflows" [(ngModel)]="wfSelected" [ngModelOptions]="{standalone: true}"  filter="filter" ></p-dropdown>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-2 control-label">Priority</label>
+                                <div class="col-sm-10">
+                                     <p-dropdown class="contentDetails"  name="priority"  [options]="priorities"  [(ngModel)]="selectedPriority" [ngModelOptions]="{standalone: true}" placeholder="Select Priority" required></p-dropdown>
+                                </div>
+                            </div>
+                           
+                            <div class="form-group" *ngIf="selectedPriority == '1'">
+                                <label for="inputPassword3" class="col-sm-2 control-label">Reason</label>
+                                <div class="col-sm-10">
+                                    <input name="rush-reason" type="text" class="form-control"  [(ngModel)]="intputReason" required autofocus id="inputPassword3" placeholder="Enter a Rush Reason">
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                            <div class="clearfix"></div>
+
+                        </div>
+                         <!--Content Technical Attributes-->
+                        <div class="panel panel-default attr-panel">
+                            <div class="panel-heading" role="tab" id="headingThree">
+                              <h4 class="panel-title">Technical Attributes </h4>
+                                <span class="template-dropdown">
+                                    <p-dropdown name="priority"  [options]="templates"  [(ngModel)]="selectedTemplate" (onChange)="getTemplate(selectedTemplate)" [ngModelOptions]="{standalone: true}" filter="filter" placeholder="Select a Template"></p-dropdown>
+                                 </span>
+                            </div>
+                            <div id="Techattr" *ngIf="selectedTemplate || addAttribute" role="tabpanel" aria-labelledby="headingThree">
+                                <div class="panel-body scrollbar-dynamic">
+                                    <table class="table table-striped custom-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Value</th>
+                                                <th> <a href="#"> <i class="fa fa-plus" tooltip="Add New Attribute"(click)="addAttribute()"></i> </a></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let attribute of attributes; let i= index">
+                                                <td>
+                                                    <span  tooltip="Click to edit" [hidden]="attribute.isEditable"  (click)="editAttribute(attribute, i)" >{{attribute.name}}<br></span>
+                                                    <div>
+                                                        <p-dropdown autoWidth='true' name="priority" [hidden]="!attribute.isEditable" [placeholder]='attribute.name' [(ngModel)]="attribute.name" [options]="codeSetDelta" (onChange)="editAttribute(attribute,i)" [ngModelOptions]="{standalone: true}" filter="filter"></p-dropdown>
+                                                    </div>
+                                                </td>
+                                                <td id="general"  [hidden]="(attribute.isEditable)" (click)="editAttribute(attribute,i)">{{attribute.value}}</td>
+                                                <!--If Datatype == Boolean-->
+                                                <td id="boolean" [hidden]="!(attribute.isEditable && attribute.datatype=='Boolean')">
+                                                    <div >
+                                                        <form class="form-control" >
+                                                            <label> <input name="Yes" type="radio" value="True" [(ngModel)]="attribute.value" [checked]="attribute.value=='True'"> Yes </label> 	&nbsp;
+                                                            <label> <input name="No" type="radio" value="False" [(ngModel)]="attribute.value" [checked]="attribute.value=='False'">  No </label>
+                                                        </form>
+                                                    </div>
+                                                </td>   
+                                                <!--If Datatype == Dropdown Single-->
+                                                <td id="dropdownSingle" [hidden]="!(attribute.isEditable && attribute.datatype=='Dropdown Single')">
+                                                     <p-dropdown autoWidth='true'  [(ngModel)]="attribute.value" [options]="attribute.codeValues"  [ngModelOptions]="{standalone: true}" filter="filter">{{attribute.codeValues}}</p-dropdown>
+                                                </td>
+                                                <!--If Datatype == Number-->
+                                                <td [hidden]="!(attribute.isEditable && attribute.datatype=='Number')">
+                                                    <input class="form-control" type="number" [(ngModel)]="attribute.value" placeholder="Enter Numeric Value">
+                                                </td>
+                                                <!--If Datatype == Text-->
+                                                <td [hidden]="!(attribute.isEditable && attribute.datatype=='Text')">
+                                                    <input class="form-control" type="Text" [(ngModel)]="attribute.value" placeholder="Enter A Value">
+                                                </td>
+                                                <td> <a href="#"><i class="fa fa-remove" tooltip="Delete an attribute" (click)="deleteAttribute(attribute.name)"></i> </a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!---------->
+                    </div>   
+                </div>
+  
